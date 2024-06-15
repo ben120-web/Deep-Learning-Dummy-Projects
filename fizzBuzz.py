@@ -5,15 +5,16 @@ import torch.optim as optim
 
 from datautils import get_pytorch_data, decoder, check_fizbuz
 
-# These are the hyperparameters. 
+# Define the hyperparameters.
 epochs = 500
 batches = 64
-lr = 0.01
+lr = 0.01 # This is the learning rate, it decides how fast we want our network to take feedback from the error on each iteration
+# The weights of each nuron are updated via weight = lr * loss.
 input_size = 10
 output_size = 4
 hidden_size = 100
 
-
+# Wrap the neural network in a class. We use the nn module so we can make use of deep learning features (algorithms).
 class FizBuzNet(nn.Module):
     """
     2 layer network for predicting fiz or buz
@@ -34,6 +35,7 @@ class FizBuzNet(nn.Module):
 
 
 trX, trY, teX, teY = get_pytorch_data(input_size, limit=1000)
+
 if torch.cuda.is_available():
     xtype = torch.cuda.FloatTensor
     ytype = torch.cuda.LongTensor
@@ -44,10 +46,16 @@ x = torch.from_numpy(trX).type(xtype)
 y = torch.from_numpy(trY).type(ytype)
 
 net = FizBuzNet(input_size, hidden_size, output_size)
+
+# Define our loss function. 
 loss_fn = nn.CrossEntropyLoss()
-optimizer = optim.Adam(net.parameters(), lr=lr)
+
+# Define our optimizer.
+optimizer = optim.Adam(net.parameters(), lr = lr)
+
 total_time = []
 no_of_batches = int(len(trX) / batches)
+
 for epoch in range(epochs):
     for batch in range(no_of_batches):
         start = batch * batches
